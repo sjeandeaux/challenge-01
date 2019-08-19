@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  postman:
+    image: postman/newman
+    volumes:
+      - ./collections:/etc/newman
+    command: run presentator.json
+    links:
+       - presentator:presentator
+    depends_on:
+       - presentator
+    networks:
+       - networks_presentator
+  presentator-it-test:
+    command: make it-test
+    hostname: presentator
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        << : *default-args  
+      target: base
+    tty: true
+    environment:
+      *default-env
+    links:
+      - mongo
+    networks:
+      - networks_presentator

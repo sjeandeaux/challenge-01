@@ -1,0 +1,103 @@
+version: '3.7'
+
+x-args:
+  &default-args
+  HTTP_PROXY: ${HTTP_PROXY}
+  HTTPS_PROXY: ${HTTPS_PROXY}
+  NO_PROXY: ${NO_PROXY}
+  http_proxy: ${HTTP_PROXY}
+  https_proxy: ${HTTPS_PROXY}
+  no_proxy: ${NO_PROXY}
+  JAVA_OPTS=: ${JAVA_OPTS}
+
+x-environment: &default-env
+  <<: *default-args
+  MONGO_INITDB_ROOT_USERNAME: devroot
+  MONGO_INITDB_ROOT_PASSWORD: devroot
+  MONGO_INITDB_DATABASE: challenge
+  ME_CONFIG_MONGODB_SERVER: mongo
+  ME_CONFIG_MONGODB_PORT: 27017
+  ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+  ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+  ME_CONFIG_MONGODB_ADMINUSERNAME: devroot
+  ME_CONFIG_MONGODB_ADMINPASSWORD: devroot
+  ME_CONFIG_BASICAUTH_USERNAME: dev
+  ME_CONFIG_BASICAUTH_PASSWORD: dev
+
+services:
+  aggregator:
+    hostname: aggregator
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        <<: *default-args
+      target: release
+    tty: true
+    restart: always
+    environment:
+      *default-env
+    ports:
+    - 4040:4040
+    links:
+    - mongo
+    - kafka1
+    - zookeeper
+    networks:
+    - networks_aggregator
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.3.0
+    environment:
+      <<: *default-env
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+    - 2181:2181
+    networks:
+    - networks_aggregator
+  kafka1:
+    image: confluentinc/cp-kafka:5.3.0
+    depends_on:
+    - zookeeper
+    ports:
+    - "29092:29092"
+    - "9092:9092"
+    environment:
+      <<: *default-env
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+    - networks_aggregator
+
+  mongo:
+    build:
+      context: ../mongo
+    container_name: mongo
+    restart: always
+    ports:
+    - "27017:27017"
+    environment:
+      <<: *default-env
+    networks:
+    - networks_aggregator
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    depends_on:
+    - mongo
+    environment:
+      <<: *default-env
+    ports:
+    - 8081:8081
+    networks:
+    - networks_aggregator
+
+networks:
+  networks_aggregator:

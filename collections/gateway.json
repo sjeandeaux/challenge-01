@@ -1,0 +1,57 @@
+{
+	"info": {
+		"_postman_id": "7c2d4792-2476-4038-9cc3-71e7a7fdc881",
+		"name": "presentator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/v1/match-aggregator/request/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"point\":{\"longitude\":48.915516, \"latitude\": 2.241223}, \"computeAt\":1406880804, \"precision\":10000, \"smoothing\": 0.9 }"
+				},
+				"url": {
+					"raw": "http://gateway/presentator/v1/match-aggregator/request/",
+					"protocol": "http",
+					"host": [
+						"gateway"
+					],
+					"path": [
+						"presentator",
+						"v1",
+						"match-aggregator",
+						"request",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/v1/referentials/polygons",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://gateway/referentialator/v1/referentials/polygons.psv",
+					"protocol": "http",
+					"host": [
+						"gateway"
+					],
+					"path": [
+						"referentialator",
+						"v1",
+						"referentials",
+						"polygons.psv"
+					]
+				}
+			},
+			"response": []
+		}
+
+	]
+}

@@ -1,0 +1,31 @@
+{
+	"info": {
+		"_postman_id": "759021ab-b592-4708-bde8-95ab75d9feab",
+		"name": "referentialator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://referentialator:9090/referentialator/v1/referentials/polygons.psv",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://referentialator:9090/referentialator/v1/referentials/polygons.psv",
+					"protocol": "http",
+					"host": [
+						"referentialator"
+					],
+					"port": "9090",
+					"path": [
+						"referentialator",
+						"v1",
+						"referentials",
+						"polygons.psv"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,6 @@
+version: '3.7'
+services:
+  ingestator:
+    build:
+      target: base
+    command: make it-test

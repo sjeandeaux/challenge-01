@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  aggregator-itest:
+    hostname: aggregator
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: base
+    command: gradle itest
+    tty: true
+    restart: always
+    links:
+    - mongo
+    - kafka1
+    - zookeeper
+    networks:
+    - networks_aggregator

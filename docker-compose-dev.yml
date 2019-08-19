@@ -1,0 +1,17 @@
+#
+# This docker-compose contains the relative path for the build.
+# It is needed by the infra docker-compose file to override the build context.
+version: '3.7'
+services:
+  ingestator:
+    build: "ingestator"
+  presentator:
+    build: "presentator"
+  referentialator:
+    build: "referentialator"
+  aggregator:
+    build: "aggregator"
+  mongo:
+    build: "mongo"
+    networks:
+      - networks_challenge

@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  postman:
+    image: postman/newman_ubuntu1404:4.4.0
+    volumes:
+      - ./collections:/etc/newman
+    command: run referentialator.json
+    links:
+       - referentialator:referentialator
+    depends_on:
+       - referentialator
+    networks:
+       - networks_referentialator

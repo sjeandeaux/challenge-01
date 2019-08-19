@@ -1,0 +1,37 @@
+#
+# This docker-compose contains the entire architecture: The needed infra + the microservices
+#
+version: '3.7'
+services:
+  gateway:
+     build: "gateway"
+     ports:
+       - "80:80"
+       - "8666:8666"
+     links:
+       - "referentialator:referentialator"
+       - "presentator:presentator"
+       - "aggregator:aggregator"
+       - "mongo-express:mongo-express"
+     networks:
+      - networks_challenge
+  presentator:
+    networks:
+      - networks_challenge
+  referentialator:
+    networks:
+      - networks_challenge
+  ingestator:
+    networks:
+      - networks_challenge
+  aggregator:
+    networks:
+      - networks_challenge
+  mongo-express:
+    networks:
+      - networks_challenge
+    environment:
+        ME_CONFIG_SITE_BASEURL: /mongo-express/
+networks:
+  networks_challenge:
+

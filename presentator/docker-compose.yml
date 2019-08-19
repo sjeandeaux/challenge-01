@@ -1,0 +1,70 @@
+version: '3.7'
+
+x-args:
+  &default-args
+  HTTP_PROXY: ${HTTP_PROXY}
+  HTTPS_PROXY: ${HTTPS_PROXY}
+  NO_PROXY: ${NO_PROXY}
+  http_proxy: ${HTTP_PROXY}
+  https_proxy: ${HTTPS_PROXY}
+  no_proxy: ${NO_PROXY}
+
+
+x-environment: &default-env
+    << : *default-args 
+    VERSION: ${VERSION}
+    BUILD_DATE: ${BUILD_DATE}
+    MONGO_INITDB_ROOT_USERNAME: devroot
+    MONGO_INITDB_ROOT_PASSWORD: devroot
+    MONGO_INITDB_DATABASE: challenge
+    ME_CONFIG_MONGODB_SERVER: mongo
+    ME_CONFIG_MONGODB_PORT: 27017
+    ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+    ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+    ME_CONFIG_MONGODB_ADMINUSERNAME: devroot
+    ME_CONFIG_MONGODB_ADMINPASSWORD: devroot
+    ME_CONFIG_BASICAUTH_USERNAME: dev
+    ME_CONFIG_BASICAUTH_PASSWORD: dev
+
+services:
+  mongo:
+    build: 
+      context: ../mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      *default-env   
+    networks:
+      - networks_presentator
+      
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      *default-env
+    networks:
+      - networks_presentator
+
+  presentator:
+    hostname: presentator
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        << : *default-args  
+      target: release
+    tty: true
+    environment:
+      *default-env    
+    ports:
+      - 8686   
+    links:
+      - mongo
+    networks:
+      - networks_presentator
+
+networks:
+  networks_presentator:

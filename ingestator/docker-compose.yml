@@ -1,0 +1,61 @@
+version: '3.7'
+
+x-args:
+  &default-args
+  HTTP_PROXY: ${HTTP_PROXY}
+  HTTPS_PROXY: ${HTTPS_PROXY}
+  NO_PROXY: ${NO_PROXY}
+  http_proxy: ${HTTP_PROXY}
+  https_proxy: ${HTTPS_PROXY}
+  no_proxy: ${NO_PROXY}
+
+
+x-environment: &default-env
+    << : *default-args 
+    VERSION: ${VERSION}
+    BUILD_DATE: ${BUILD_DATE}
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.3.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - networks_ingestator
+  kafka1:
+    image: confluentinc/cp-kafka:5.3.0
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - networks_ingestator
+  ingestator:
+    hostname: ingestator
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        << : *default-args  
+      target: release
+    tty: true
+    restart: always
+    environment:
+      *default-env       
+    links:
+      - zookeeper
+      - kafka1:kafka1
+    networks:
+      - networks_ingestator
+
+networks:
+  networks_ingestator:

@@ -1,0 +1,37 @@
+version: '3.7'
+
+x-args:
+  &default-args
+  HTTP_PROXY: ${HTTP_PROXY}
+  HTTPS_PROXY: ${HTTPS_PROXY}
+  NO_PROXY: ${NO_PROXY}
+  http_proxy: ${HTTP_PROXY}
+  https_proxy: ${HTTPS_PROXY}
+  no_proxy: ${NO_PROXY}
+
+
+x-environment: &default-env
+    << : *default-args 
+    VERSION: ${VERSION}
+    BUILD_DATE: ${BUILD_DATE}
+
+services:
+
+  referentialator:
+    hostname: referentialator
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        << : *default-args  
+      target: release
+    tty: true
+    environment:
+      *default-env
+    ports:
+      - 9090:9090
+    networks:
+       - networks_referentialator
+       
+networks:
+  networks_referentialator:

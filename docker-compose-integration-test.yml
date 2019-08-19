@@ -1,0 +1,17 @@
+#
+# This docker-compose that plugs to the other containers and runs the postman collections to validate the whole flow.
+#
+version: '3.7'
+services:
+  postman:
+    image: postman/newman
+    volumes:
+      - ./collections:/etc/newman
+    command: run gateway.json
+    links:
+       - gateway:gateway
+       - presentator:presentator
+    depends_on:
+       - gateway
+    networks:
+       - networks_challenge
