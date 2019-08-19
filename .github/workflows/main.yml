@@ -1,0 +1,11 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run make
+      run: make help
